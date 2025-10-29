@@ -2,36 +2,153 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ปัน-กัน: รายการความต้องการ</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .need-card { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-        .item { border-left: 5px solid #4CAF50; }
-        .volunteer { border-left: 5px solid #2196F3; }
+        /* Base Styles */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f7f7f7; 
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #333;
+        }
+        .add-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #FFC107; /* Yellow Accent */
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .add-btn:hover {
+            background-color: #ff9800;
+        }
+
+        /* Card Design */
+        .need-card { 
+            background-color: white; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); 
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .need-card:hover {
+            transform: translateY(-2px);
+        }
+        .need-card h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .need-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        /* Type Colors */
+        .item h2 { color: #4CAF50; } /* Item/Donation: Green */
+        .volunteer h2 { color: #2196F3; } /* Volunteer/Skill: Blue */
+
+        /* Detail Block */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+        }
+        .details-grid strong {
+            color: #333;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Fulfill Button */
+        .fulfill-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #444;
+            font-size: 0.9em;
+        }
+        .fulfill-link:hover {
+            background-color: #e0e0e0;
+        }
+        
+        @media (max-width: 600px) {
+            .fulfill-link {
+                position: static;
+                display: block;
+                text-align: center;
+                margin-top: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>ปัน-กัน: รายการความต้องการล่าสุด 🙏</h1>
-    <p><a href="{{ url_for('create') }}">➕ เพิ่มความต้องการใหม่</a></p>
-    <hr>
-    
-    {% for need in needs %}
-    <div class="need-card {% if need.type == 'Item' %}item{% else %}volunteer{% endif %}">
-        <h2>{{ need.title }}</h2>
-        <p><strong>ประเภท:</strong> {{ need.type }}</p>
-        <p><strong>รายละเอียด:</strong> {{ need.description }}</p>
-        <p><strong>ติดต่อ:</strong> {{ need.contact }}</p>
-        <p>
+    <div class="container">
+        <div class="header">
+            <h1>ปัน-กัน: รายการความต้องการล่าสุด 🙏</h1>
+            <a href="{{ url_for('create') }}" class="add-btn">➕ เพิ่มความต้องการใหม่</a>
+        </div>
+        
+        {% for need in needs %}
+        <div class="need-card {% if need.type == 'Item' %}item{% else %}volunteer{% endif %}">
+            <h2>{{ need.title }}</h2>
+            <p><strong>ประเภท:</strong> {{ need.type }}</p>
+            <p><strong>รายละเอียด:</strong> {{ need.description }}</p>
+            
             <a href="{{ url_for('fulfill', need_id=need.id) }}" 
-               onclick="return confirm('ยืนยันว่ารายการนี้สำเร็จแล้วหรือไม่?');">
-                ✅ **รายการนี้สำเร็จแล้ว**
+               onclick="return confirm('ยืนยันว่ารายการนี้สำเร็จแล้วหรือไม่?');"
+               class="fulfill-link">
+                ✅ รายการนี้สำเร็จแล้ว
             </a>
-        </p>
-    </div>
-    {% endfor %}
 
-    {% if not needs %}
-    <p>ขณะนี้ยังไม่มีรายการความต้องการที่เปิดอยู่</p>
-    {% endif %}
+            <div class="details-grid">
+                <div>
+                    <strong>ผู้ติดต่อ:</strong> 
+                    <span style="color: #6a6a6a;">{{ need.contact_name }} {{ need.contact_lastname }}</span>
+                </div>
+                <div>
+                    <strong>อีเมล:</strong> 
+                    <a href="mailto:{{ need.contact_email }}" style="color: #2196F3;">{{ need.contact_email }}</a>
+                </div>
+                <div>
+                    <strong>โทรศัพท์:</strong> 
+                    <span style="color: #6a6a6a;">{{ need.contact_phone or '-' }}</span>
+                </div>
+            </div>
+            
+        </div>
+        {% endfor %}
+
+        {% if not needs %}
+        <p style="text-align: center; color: #777; margin-top: 50px;">
+            ขณะนี้ยังไม่มีรายการความต้องการที่เปิดอยู่<br>ลองเพิ่มรายการใหม่ได้เลย!
+        </p>
+        {% endif %}
+    </div>
 </body>
 </html>

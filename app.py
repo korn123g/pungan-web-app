@@ -13,16 +13,9 @@ def get_db_connection():
     return conn
 
 def init_db():
-    """สร้างตาราง 'needs' หากยังไม่มี พร้อมคอลัมน์ใหม่สำหรับข้อมูลผู้ติดต่อ"""
+    """สร้างตาราง 'needs_v2' หากยังไม่มี (แก้ไข: ลบคอมเมนต์ # ใน SQL ออก)"""
     conn = get_db_connection()
-    # เนื่องจากเราไม่สามารถแก้ไขตารางเดิมได้โดยตรงโดยไม่ล้างข้อมูล
-    # ในการพัฒนาจริง เราจะใช้คำสั่ง ALTER TABLE แต่เพื่อให้ง่ายต่อการ deploy
-    # เราจะทำการสร้างตารางใหม่ที่มีคอลัมน์ครบถ้วน
-    
-    # คำสั่งนี้คือการสร้างตาราง needs_v2 ที่มีคอลัมน์ใหม่
-    # ในการใช้งานครั้งแรก หากตารางเดิม (needs) ยังไม่มีคอลัมน์เหล่านี้
-    # ระบบจะเกิด Error เมื่อรันฟังก์ชัน index() หรือ create() 
-    # ดังนั้นเราต้องแน่ใจว่าตารางที่ใช้งานมีคอลัมน์เหล่านี้ครบถ้วน
+    # ใช้คำสั่ง SQL โดยไม่มีคอมเมนต์ # ในบล็อกคำสั่ง เพื่อให้ Render Deploy สำเร็จ
     conn.execute("""
         CREATE TABLE IF NOT EXISTS needs_v2 (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,20 +23,19 @@ def init_db():
             type TEXT NOT NULL,          -- 'Item' หรือ 'Volunteer'
             description TEXT NOT NULL,
             
-            # --- คอลัมน์ใหม่สำหรับการติดต่อตามแบบฟอร์ม ---
+            -- คอลัมน์ใหม่สำหรับการติดต่อตามแบบฟอร์ม
             contact_name TEXT, 
             contact_lastname TEXT,
             contact_email TEXT NOT NULL,
             contact_phone TEXT,
-            # -----------------------------------------------
-
+            
             status TEXT DEFAULT 'Open'   -- 'Open' หรือ 'Fulfilled'
         );
     """)
     conn.commit()
     conn.close()
 
-# เรียกฟังก์ชันสร้างฐานข้อมูลเมื่อเริ่มต้น (เราจะใช้ตาราง needs_v2)
+# เรียกฟังก์ชันสร้างฐานข้อมูลเมื่อเริ่มต้น
 init_db()
 
 # กำหนดชื่อตารางใหม่ที่จะใช้งาน
@@ -58,6 +50,8 @@ def index():
     # ดึงข้อมูลจากตารางใหม่ needs_v2
     needs = conn.execute(f'SELECT * FROM {TABLE_NAME} WHERE status = "Open" ORDER BY id DESC').fetchall()
     conn.close()
+    
+    # ดึงคอลัมน์ใหม่ทั้งหมดเพื่อให้แสดงผลได้
     return render_template('index.html', needs=needs)
 
 @app.route('/create', methods=('GET', 'POST'))

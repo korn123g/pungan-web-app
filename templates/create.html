@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ปัน-กัน: สร้างความต้องการใหม่</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>สร้างความต้องการใหม่</h1>
+    <p><a href="{{ url_for('index') }}">← กลับไปหน้าหลัก</a></p>
+    <hr>
+
+    <form method="post">
+        <label for="title">หัวข้อ (เช่น ต้องการหนังสือ, อาสาช่วยงาน)</label>
+        <input type="text" name="title" id="title" required>
+
+        <label for="type">ประเภทความช่วยเหลือ</label>
+        <select name="type" id="type" required>
+            <option value="Item">สิ่งของบริจาค</option>
+            <option value="Volunteer">จิตอาสา/แรงงาน/ทักษะ</option>
+        </select>
+
+        <label for="description">รายละเอียดความต้องการ (เช่น จำนวน, ลักษณะงาน)</label>
+        <textarea name="description" id="description" rows="5" required></textarea>
+
+        <label for="contact">ช่องทางการติดต่อ (เช่น อีเมล, เบอร์โทรศัพท์)</label>
+        <input type="text" name="contact" id="contact" required>
+
+        <button type="submit">โพสต์ความต้องการ</button>
+    </form>
+</body>
+</html>
